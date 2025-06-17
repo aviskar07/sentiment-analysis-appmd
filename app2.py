@@ -1,17 +1,16 @@
 import streamlit as st
 from nltk.sentiment import SentimentIntensityAnalyzer
-from transformers import AutoTokenizer, TFAutoModelForSequenceClassification
-import tensorflow as tf
+from transformers import AutoTokenizer, AutoModelForSequenceClassification
+import torch
 from scipy.special import softmax
 import numpy as np
-#minor 
 # Load VADER
 sia = SentimentIntensityAnalyzer()
 
 # Load RoBERTa
 roberta_model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(roberta_model_name)
-model = TFAutoModelForSequenceClassification.from_pretrained(roberta_model_name)
+model = AutoModelForSequenceClassification.from_pretrained(roberta_model_name)
 
 labels = ['negative', 'neutral', 'positive']
 
@@ -29,7 +28,7 @@ if st.button("Analyze"):
 
         encoded_input = tokenizer(text_input, return_tensors='tf', truncation=True, max_length=512)
         output = model(**encoded_input)
-        scores = output.logits[0].numpy()
+        scores = output.logits[0].detach().numpy()
         scores = softmax(scores)
         roberta_result = {f"roberta_{label}": round(score, 3) for label, score in zip(labels, scores)}
         roberta_sentiment = labels[np.argmax(scores)]
