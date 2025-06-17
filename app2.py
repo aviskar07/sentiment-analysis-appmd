@@ -4,6 +4,7 @@ from transformers import AutoTokenizer, AutoModelForSequenceClassification
 import torch
 from scipy.special import softmax
 import numpy as np
+
 # Load VADER
 sia = SentimentIntensityAnalyzer()
 
@@ -23,16 +24,19 @@ if st.button("Analyze"):
     if not text_input.strip():
         st.warning("Please enter some text.")
     else:
+        # VADER analysis
         vader_scores = sia.polarity_scores(text_input)
         vader_sentiment = max(vader_scores, key=vader_scores.get)
 
-        encoded_input = tokenizer(text_input, return_tensors='tf', truncation=True, max_length=512)
+        # RoBERTa analysis
+        encoded_input = tokenizer(text_input, return_tensors='pt', truncation=True, max_length=512)
         output = model(**encoded_input)
         scores = output.logits[0].detach().numpy()
         scores = softmax(scores)
         roberta_result = {f"roberta_{label}": round(score, 3) for label, score in zip(labels, scores)}
         roberta_sentiment = labels[np.argmax(scores)]
 
+        # Show results
         st.subheader("VADER Sentiment")
         st.json(vader_scores)
         st.write(f"**VADER Sentiment:** `{vader_sentiment.capitalize()}`")
