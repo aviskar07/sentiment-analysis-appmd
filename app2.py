@@ -33,6 +33,7 @@ if st.button("Analyze"):
 
         # RoBERTa analysis
         encoded_input = tokenizer(text_input, return_tensors='pt', truncation=True, max_length=512)
+        encoded_input = {k: v.to('cpu') for k, v in encoded_input.items()}
         output = model(**encoded_input)
         scores = output.logits[0].detach().cpu().numpy()
         scores = softmax(scores)
