@@ -33,7 +33,7 @@ if st.button("Analyze"):
         # RoBERTa analysis
         encoded_input = tokenizer(text_input, return_tensors='pt', truncation=True, max_length=512)
         output = model(**encoded_input)
-        scores = output.logits[0].detach().numpy()
+        scores = output.logits[0].detach().cpu().numpy()
         scores = softmax(scores)
         roberta_result = {f"roberta_{label}": round(score, 3) for label, score in zip(labels, scores)}
         roberta_sentiment = labels[np.argmax(scores)]
