@@ -14,7 +14,8 @@ sia = SentimentIntensityAnalyzer()
 roberta_model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(roberta_model_name)
 model = AutoModelForSequenceClassification.from_pretrained(roberta_model_name)
-
+model.eval()
+model.to("cpu")
 labels = ['negative', 'neutral', 'positive']
 
 st.title("📊 Sentiment Analysis App")
