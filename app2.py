@@ -14,8 +14,7 @@ sia = SentimentIntensityAnalyzer()
 roberta_model_name = "cardiffnlp/twitter-roberta-base-sentiment"
 tokenizer = AutoTokenizer.from_pretrained(roberta_model_name)
 model = AutoModelForSequenceClassification.from_pretrained(roberta_model_name)
-model.eval()
-model.to("cpu")
+
 labels = ['negative', 'neutral', 'positive']
 
 st.title("📊 Sentiment Analysis App")
@@ -33,9 +32,8 @@ if st.button("Analyze"):
 
         # RoBERTa analysis
         encoded_input = tokenizer(text_input, return_tensors='pt', truncation=True, max_length=512)
-        encoded_input = {k: v.to('cpu') for k, v in encoded_input.items()}
         output = model(**encoded_input)
-        scores = output.logits[0].detach().cpu().numpy()
+        scores = output.logits[0].detach().numpy()
         scores = softmax(scores)
         roberta_result = {f"roberta_{label}": round(score, 3) for label, score in zip(labels, scores)}
         roberta_sentiment = labels[np.argmax(scores)]
